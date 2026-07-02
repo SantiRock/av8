@@ -1,3 +1,4 @@
+import { Canvas } from "./components/Canvas"
 import { Header } from "./components/Header"
 import { Projects } from "./components/Projects"
 import { Oficinas } from "./components/Oficinas"
@@ -7,14 +8,18 @@ import "./App.css"
 function App() {
 
   return (
-    <div className="container">
-      <Header />
-      <main>
-        <Projects />
-        <Oficinas />
-      </main>
-      <Footer />
-    </div>
+    <>
+      <Canvas />
+       <div className="container">
+        <Header />
+        <main>
+          <Projects />
+          <Oficinas />
+        </main>
+        <Footer />
+      </div>
+    </>
+
   )
 }
 

@@ -81,7 +81,7 @@ void main() {
     vec3 gray = vec3(dot(grayXfer, color));
     
     //color += vec3(0., 0., sin(u_time * 0.5)* 0.2);
-    color *= 0.47;
+    color *= 0.5;
 
     gl_FragColor = vec4(mix(color, gray, 0.7), 1.0);
 }
