@@ -1,0 +1,20 @@
+h1 {
+    font-size: 37px;
+    font-weight: 700;
+    letter-spacing: -2px;
+    line-height: 1;
+}
+
+.st {
+    font-style: italic;
+}
+
+.about { 
+    margin-top: 13px;
+    line-height: 1.75; 
+    max-width: 580px; 
+}
+
+.insta {
+    color: rgb(197, 197, 197);
+}

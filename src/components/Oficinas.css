@@ -1,0 +1,23 @@
+.o_p {
+    color: white;
+}
+
+.o_p:hover {
+    color:rgb(254, 179, 195);
+}
+
+.o_l:hover .o_p{
+    color:rgb(254, 179, 195);
+}
+
+.of_c1 {
+    margin-top: 13px;
+}
+
+.med_s {
+    color: rgb(255, 255, 255);
+}
+
+.med:hover .med_s {
+    color:rgb(254, 179, 195);
+}

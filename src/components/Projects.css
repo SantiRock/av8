@@ -1,0 +1,27 @@
+.projects {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.p_container {
+    margin-right: 17px;
+    max-width: 500px;
+}
+
+.p_t {
+    color: white;
+    font-weight: 700;
+}
+
+.p_container:hover .p_l, .p_container:hover .p_t{
+    color: rgb(254, 179, 195); 
+}
+
+.projects_p {
+    margin: 7px 0 2px;
+}
+
+.p_p {
+    font-weight: 400;
+    color: white;
+}
