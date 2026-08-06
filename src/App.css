@@ -5,3 +5,7 @@ html {
 .container {
     padding: 2rem;
 }
+
+ul {
+  padding-left: 1rem;
+}
