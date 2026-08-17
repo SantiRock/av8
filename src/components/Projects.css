@@ -13,8 +13,12 @@
     font-weight: 700;
 }
 
-.p_container:hover .p_l, .p_container:hover .p_t{
+.p_container:hover .p_l {
     color: rgb(254, 179, 195); 
+}
+
+.p_container:hover .p_t {
+    color: rgb(255, 255, 255); 
 }
 
 .projects_p {
