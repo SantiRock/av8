@@ -1,87 +1,102 @@
+#ifdef GL_FRAGMENT_PRECISION_HIGH
 precision highp float;
+#else
+precision mediump float;
+#endif
 
 uniform vec2 u_resolution;
 uniform float u_time;
+uniform float u_waveDetail;
 
-varying vec2 v_texcoord;
+// Antiguos inputs del ISF, ahora variables fijas
+vec3 color1 = vec3(0.);
+vec3 color2 = vec3(0.1, 0.4, 0.7);
+vec3 color3 = vec3(0.);
+vec3 color4 = vec3(0.3, 0.3, 0.2);
+float bandCount = 40.;
+float waveAmplitude = 0.;
+float waveFrequency = 5.;
+float waveSpeed = 0.1;
+float rotation = 0.;
+float timeSpeed = 1.;
 
-const float PI = 3.1415926535;
-const float TWOPI = PI * 2.;
+#define PI 3.14159265359
 
-vec3 hsv2rgb(float h, float s, float v) {
-    return mix(vec3(1.), clamp((abs(fract(h+vec3(3., 2.,1.)/3.)*6.-3.)-1.),0.,1.), s) * v;
+mat2 rot(float a) {
+    float s = sin(a), c = cos(a);
+    return mat2(c, -s, s, c);
 }
 
-
-vec3 palette(float t) {
-    vec3 c0 = vec3(0.95, 0.85, 0.90);
-    vec3 c1 = vec3(0.95, 0.9, 0.85);
-    vec3 c2 = vec3(0.75, 0.9, 0.8);
-    vec3 c3 = vec3(0.95, 0.85, 0.90);
-
-    t = fract(t);
-
-    vec3 col = mix(c0, c1, smoothstep(0.0, 0.47, t));
-    col = mix(col, c2, smoothstep(0.47, 0.93, t));
-    col = mix(col, c3, smoothstep(0.93, 1., t));
-
-    return col;
+float hash(vec2 p) {
+    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
 }
 
-float ring(vec2 p) {
-    float len = length(p) - 0.55;
-    len *= length(p * p) - 0.66;
-    float d = len * len * 512.;
-
-    return 1. - d * d;
+float noise(vec2 p) {
+    vec2 i = floor(p);
+    vec2 f = fract(p);
+    f = f * f * (3.0 - 2.0 * f);
+    float a = hash(i);
+    float b = hash(i + vec2(1.0, 0.0));
+    float c = hash(i + vec2(0.0, 1.0));
+    float d = hash(i + vec2(1.0, 1.0));
+    return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
 }
 
-vec2 animation(vec2 p) {
-    float t = u_time * 0.25;
-
-    p.x += sin(p.x * 2. + t) * 0.4 -
-           cos(p.y * 1. - t) * 0.5 -
-           sin(p.x * 3. + t) * 0.3 +
-           cos(p.y * 0.3 - t) * 0.1;
-    
-    p.y += sin(p.x * 5. + t) * 0.7 -
-           cos(p.y * 8. - t) * 0.3 +
-           sin(p.x * 4. + t) * 0.4 -
-           cos(p.y * 6. - t) * 0.3;
-
-    return p;
+float fbm(vec2 p) {
+    float v = 0.0;
+    float a = 0.5;
+    for (int i = 0; i < 5; i++) {
+        v += a * noise(p);
+        p *= 2.0;
+        a *= 0.5;
+    }
+    return v;
 }
-
-vec3 ring_color(vec2 p) {
-    float d = ring(p);
-    float angle = (atan(p.y, p.x) + PI) / TWOPI;
-    angle += 0.1 * sin(u_time);
-
-    float hue = angle;
-    float lum = d;
-    vec3 col = hsv2rgb(hue, 0.66, lum);
-
-    return col;
-}
-
 
 void main() {
-    vec2 uv = v_texcoord * 0.5 + 0.5;
+    float waveDetail = u_waveDetail;
+    vec2 uv = (gl_FragCoord.xy - 0.5 * u_resolution) / u_resolution.y;
+    float time = u_time * timeSpeed;
 
-    uv = animation(uv);
-    //uv = animation(uv * 0.9);
+    // Rotación global
+    uv = rot(rotation) * uv;
 
-    //uv *= 2.;
-    //uv = fract(uv);
+    // Distorsión orgánica con FBM
+    float warp1 = fbm(uv * waveFrequency + time * waveSpeed) - 0.5;
+    float warp2 = fbm(uv * waveFrequency * 1.5 + vec2(5.2, 1.3) - time * waveSpeed * 0.7) - 0.5;
 
-    vec3 color = vec3(ring(uv));
-    color = ring_color(uv);
-    
-    vec3 grayXfer = vec3(0.3, 0.59, 0.11);
-    vec3 gray = vec3(dot(grayXfer, color));
-    
-    //color += vec3(0., 0., sin(u_time * 0.5)* 0.2);
-    color *= 0.5;
+    // Coordenada base diagonal
+    float baseCoord = uv.x * 1.3 + uv.y * 0.7;
 
-    gl_FragColor = vec4(mix(color, gray, 0.7), 1.0);
+    baseCoord += warp1 * waveAmplitude;
+    baseCoord += warp2 * waveAmplitude * 0.5;
+
+    // Detalle adicional
+    if (waveDetail > 1.0) {
+        float detailWarp = fbm(uv * waveFrequency * 3.0 + time * waveSpeed * 0.3) - 0.5;
+        baseCoord += detailWarp * (waveDetail - 1.0) * 0.3;
+    }
+
+    // Bandas
+    float band = baseCoord * bandCount;
+    float bandIndex = abs(floor(band));
+
+    // Ciclo de 4 colores: 0, 1, 2, 3, 0, 1, ...
+    float colorIdx = mod(bandIndex, 4.0);
+
+    vec3 col;
+    if (colorIdx < 1.0) col = color1;
+    else if (colorIdx < 2.0) col = color2;
+    else if (colorIdx < 3.0) col = color3;
+    else col = color4;
+
+    // Viñeta
+    vec2 vig_uv = (gl_FragCoord.xy / u_resolution - 0.5) * 1.4;
+    float vig = 1.0 - length(vig_uv) * 0.1;
+    col *= vig;
+
+    // Gamma
+    col = pow(col, vec3(1.0 / 2.2));
+
+    gl_FragColor = vec4(col * 0.55, 1.0);
 }
