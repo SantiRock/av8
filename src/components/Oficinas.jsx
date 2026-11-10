@@ -9,6 +9,7 @@ export const Oficinas = ({lang}) => {
         <p>Video-Mapping</p>
         <p>VJing</p>
         <p>Resolume</p>
+        <p>Web Development</p>
       </div>
       <div className="of_c1">
         <p>{lang.pedagogia_p1}</p>
