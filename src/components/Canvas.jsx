@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import "./Canvas.css"
 
 import vertexSource from "../shaders/vertex.glsl?raw";
 import fragmentSource from "../shaders/fragment.glsl?raw";
@@ -110,12 +111,12 @@ export function Canvas() {
 
     const uResolution = gl.getUniformLocation(program, "u_resolution");
 
-    const uWaveDetail = gl.getUniformLocation(program, "u_waveDetail");
+    const uWaveDetail = gl.getUniformLocation(program, "u_lineThickness");
 
-    const MIN_D = 1.0; // esquina superior izquierda
-    const MAX_D = 6.0; // esquina inferior derecha
+    const MIN_D = 0.07; // esquina superior izquierda
+    const MAX_D = 0.8; // esquina inferior derecha
 
-    let target = 4.0; // valor inicial hasta que se mueva el mouse
+    let target = 0.3; // valor inicial hasta que se mueva el mouse
     let current = target;
 
     onMove = (e) => {

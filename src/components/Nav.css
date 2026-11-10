@@ -1,0 +1,122 @@
+.nav {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh;
+  width: 3.5rem;
+  padding: 1.5rem 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  z-index: 100;
+  box-sizing: border-box;
+}
+
+.nav ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Idiomas */
+.nav__langs {
+  gap: 3px;
+}
+
+.nav__lang {
+  background: none;
+  border: none;
+  font: inherit;
+  font-size: 0.85rem;
+  color: currentColor;
+  opacity: 0.6;
+  cursor: pointer;
+  transition: opacity 0.2s ease;
+}
+
+.nav__lang:hover,
+.nav__lang:focus-visible {
+  opacity: 1;
+}
+
+.nav__lang--active {
+  opacity: 1;
+}
+
+/* Puntos de sección */
+.nav__dots {
+  gap: 1rem;
+}
+
+.nav__dot {
+  display: block;
+  width: 0.75rem;
+  height: 0.75rem;
+  padding: 0;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  opacity: 0.6;
+  cursor: pointer;
+  transition: background-color 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
+}
+
+.nav__dot:hover,
+.nav__dot:focus-visible {
+  opacity: 1;
+  transform: scale(1.2);
+}
+
+/* Etiqueta que se despliega hacia la izquierda */
+.nav__item {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.nav__label {
+  position: absolute;
+  right: 100%;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-right: 0.75rem;
+  max-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  font-size: 0.85rem;
+  line-height: 1;
+  opacity: 0;
+  pointer-events: none;
+  transition: max-width 0.3s ease, opacity 0.2s ease;
+}
+
+.nav__item:hover .nav__label,
+.nav__item:focus-within .nav__label {
+  max-width: 10rem;
+  opacity: 1;
+}
+
+/* Estado activo: lo aplicarás luego con la lógica */
+.nav__dot--active {
+  background-color: currentColor;
+  opacity: 1;
+}
+
+.nav__lang:focus-visible,
+.nav__dot:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav__lang,
+  .nav__dot,
+  .nav__label {
+    transition: none;
+  }
+}

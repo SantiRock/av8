@@ -6,21 +6,19 @@ precision mediump float;
 
 uniform vec2 u_resolution;
 uniform float u_time;
-uniform float u_waveDetail;
+uniform float u_lineThickness;
 
 // Antiguos inputs del ISF, ahora variables fijas
-vec3 color1 = vec3(0.);
-vec3 color2 = vec3(0.1, 0.4, 0.7);
-vec3 color3 = vec3(0.);
-vec3 color4 = vec3(0.3, 0.3, 0.2);
-float bandCount = 40.;
-float waveAmplitude = 0.;
-float waveFrequency = 5.;
-float waveSpeed = 0.1;
+vec3 color1 = vec3(0.16, 0.4, 1.0);   // fondo
+vec3 color2 = vec3(0.);              // color de línea
+float scale = 40.;
+float lineCount = 30.;
+float distortion = 3.;
+float detail = 4.;
+float flowSpeed = 0.4;
 float rotation = 0.;
-float timeSpeed = 1.;
-
-#define PI 3.14159265359
+float warp = 0.;
+float timeSpeed = 0.4;
 
 mat2 rot(float a) {
     float s = sin(a), c = cos(a);
@@ -35,68 +33,72 @@ float noise(vec2 p) {
     vec2 i = floor(p);
     vec2 f = fract(p);
     f = f * f * (3.0 - 2.0 * f);
+
     float a = hash(i);
     float b = hash(i + vec2(1.0, 0.0));
     float c = hash(i + vec2(0.0, 1.0));
     float d = hash(i + vec2(1.0, 1.0));
+
     return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
 }
 
 float fbm(vec2 p) {
-    float v = 0.0;
-    float a = 0.5;
-    for (int i = 0; i < 5; i++) {
-        v += a * noise(p);
-        p *= 2.0;
-        a *= 0.5;
+    float value = 0.0;
+    float amplitude = 0.5;
+    float frequency = 1.0;
+
+    int octaves = int(detail);
+    for (int i = 0; i < 8; i++) {
+        if (i >= octaves) break;
+        value += amplitude * noise(p * frequency);
+        frequency *= 2.0;
+        amplitude *= 0.5;
     }
-    return v;
+    return value;
+}
+
+float warpedFbm(vec2 p) {
+    vec2 q = vec2(
+        fbm(p + vec2(0.0, 0.0)),
+        fbm(p + vec2(5.2, 1.3))
+    );
+
+    vec2 r = vec2(
+        fbm(p + 4.0 * q + vec2(1.7, 9.2)),
+        fbm(p + 4.0 * q + vec2(8.3, 2.8))
+    );
+
+    return fbm(p + warp * r);
 }
 
 void main() {
-    float waveDetail = u_waveDetail;
     vec2 uv = (gl_FragCoord.xy - 0.5 * u_resolution) / u_resolution.y;
     float time = u_time * timeSpeed;
 
-    // Rotación global
     uv = rot(rotation) * uv;
+    uv *= scale;
+    uv += time * flowSpeed;
 
-    // Distorsión orgánica con FBM
-    float warp1 = fbm(uv * waveFrequency + time * waveSpeed) - 0.5;
-    float warp2 = fbm(uv * waveFrequency * 1.5 + vec2(5.2, 1.3) - time * waveSpeed * 0.7) - 0.5;
+    // Ruido orgánico
+    float n = warpedFbm(uv * 0.5);
+    n *= distortion;
 
-    // Coordenada base diagonal
-    float baseCoord = uv.x * 1.3 + uv.y * 0.7;
+    // Curvas de nivel
+    float contour = fract(n * lineCount / 8.0);
+    float line = step(u_lineThickness, contour);
 
-    baseCoord += warp1 * waveAmplitude;
-    baseCoord += warp2 * waveAmplitude * 0.5;
+    vec3 col = mix(color1, color2, line);
 
-    // Detalle adicional
-    if (waveDetail > 1.0) {
-        float detailWarp = fbm(uv * waveFrequency * 3.0 + time * waveSpeed * 0.3) - 0.5;
-        baseCoord += detailWarp * (waveDetail - 1.0) * 0.3;
-    }
-
-    // Bandas
-    float band = baseCoord * bandCount;
-    float bandIndex = abs(floor(band));
-
-    // Ciclo de 4 colores: 0, 1, 2, 3, 0, 1, ...
-    float colorIdx = mod(bandIndex, 4.0);
-
-    vec3 col;
-    if (colorIdx < 1.0) col = color1;
-    else if (colorIdx < 2.0) col = color2;
-    else if (colorIdx < 3.0) col = color3;
-    else col = color4;
+    // Textura sutil
+    float grain = noise(uv * 20.0) * 0.015;
+    col += grain;
 
     // Viñeta
     vec2 vig_uv = (gl_FragCoord.xy / u_resolution - 0.5) * 1.4;
-    float vig = 1.0 - length(vig_uv) * 0.1;
+    float vig = 1.0 - length(vig_uv) * 0.15;
     col *= vig;
 
-    // Gamma
     col = pow(col, vec3(1.0 / 2.2));
 
-    gl_FragColor = vec4(col * 0.55, 1.0);
+    gl_FragColor = vec4(col * 0.4, 1.0);
 }

@@ -1,19 +1,26 @@
-import "./Projects.css"
+import "./Projects.css";
 
+const items = ["zhizhwa", "vj", "points", "skull", "shader_model"];
 
-export const Projects = () => {
+export const Projects = ({ lang, experiences }) => {
 
     return (
-        <section >
-            <h2>Projetos</h2>
-            <div className="projects">
-                <div className="p_container">
-                    <p className="projects_p">// <a className="p_t" href="https://santirock.github.io/zhizhwa/" target="_blank">Zhizhwa<span className="p_p">: Inspirada no universo VJ (mixagem de vídeo em tempo real), Zhizhwa é uma interface web que permite ao visitante modificar, em tempo real, uma animação gerada por código, dando origem a infinitas variações de uma forma que se desenha e se desfaz continuamente.</span></a></p>
-                    <a className="p_l" href="https://santirock.github.io/zhizhwa/" target="_blank">Link</a>
-                </div>
-            </div>
-        </section>
-    )
-
-
-} 
+    <section id="experiences" className="section">
+      <h2>{lang.experiences_title}</h2>
+      <ul className="projects">
+        {items.map((key) => (
+          <li key={key}>
+            <a href={experiences[key].link} target="_blank" className="projects__link">
+              <img
+                src={`/imgs/exps/img_${key}.jpg`}
+                alt={experiences[key].title}
+                className="projects__img"
+              />
+              <span className="projects__name">{experiences[key].title}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+};

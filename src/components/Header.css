@@ -1,16 +1,24 @@
+header{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 90dvh;
+    margin-bottom: 30px;
+}
+
 h1 {
-    font-size: 37px;
+    font-size: 3.0rem;
     font-weight: 700;
     letter-spacing: -2px;
     line-height: 1;
 }
 
 .st {
+    font-size: 1.0rem;
     font-style: italic;
 }
 
 .about { 
-    margin-top: 13px;
     line-height: 1.75; 
     max-width: 580px; 
 }
