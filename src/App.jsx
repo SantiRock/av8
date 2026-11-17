@@ -24,7 +24,7 @@ function App() {
         <Header lang={langs[lang]} />
         <main>
           <Projects lang={langs[lang]} experiences={langs.experiences}/>
-          <Oficinas lang={langs[lang]}/>
+          <Oficinas lang={langs[lang]} pedagogy={langs.pedagogy}/>
           <Contact />
         </main>
         <Footer />

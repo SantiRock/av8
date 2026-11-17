@@ -120,8 +120,8 @@ export function Canvas() {
     let current = target;
 
     onMove = (e) => {
-      const nx = e.clientX / window.innerWidth;
-      const ny = e.clientY / window.innerHeight;
+      const nx = 1. - e.clientX / window.innerWidth;
+      const ny = 1. - e.clientY / window.innerHeight;
       const t = Math.min(Math.max((nx + ny) / 2, 0), 1);
       target = MIN_D + t * (MAX_D - MIN_D);
     };

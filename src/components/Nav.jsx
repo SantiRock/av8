@@ -23,7 +23,7 @@ export const Nav = ({setLang, lang, alang}) => {
           <a href="#experiences" className={`nav__dot ${active === 1 ? 'nav__dot--active' : ''}`} onClick={() => setActive(1)} aria-label="Experiences"></a>
         </li>
         <li className="nav__item">
-          <span className="nav__label" aria-hidden="true">{lang.pedagogia_title}</span>
+          <span className="nav__label" aria-hidden="true">{lang.pedagogia_nav}</span>
           <a href="#pedagogy" className={`nav__dot ${active === 2 ? 'nav__dot--active' : ''}`} onClick={() => setActive(2)} aria-label="Pedagogy"></a>
         </li>
         <li className="nav__item">
